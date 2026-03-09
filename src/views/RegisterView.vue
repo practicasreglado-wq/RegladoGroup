@@ -1,32 +1,22 @@
 ﻿<template>
-  <section class="form-page">
-    <div class="form-card">
-      <h1>Registro de usuario</h1>
-      <p>Completa tus datos para solicitar acceso al portal corporativo.</p>
-
-      <form class="clean-form" @submit.prevent>
-        <label>
-          Nombre completo
-          <input type="text" placeholder="Tu nombre" required />
-        </label>
-
-        <label>
-          Email corporativo
-          <input type="email" placeholder="nombre@tuempresa.com" required />
-        </label>
-
-        <label>
-          Departamento
-          <input type="text" placeholder="Ej. Operaciones" required />
-        </label>
-
-        <label>
-          Contraseña
-          <input type="password" placeholder="********" required />
-        </label>
-
-        <button class="btn-primary" type="submit">Crear cuenta</button>
-      </form>
-    </div>
-  </section>
+  <RegisterForm
+    title="Registro de usuario"
+    description="Completa tus datos. Te enviaremos un correo para activar tu cuenta."
+    button-text="Crear cuenta"
+  />
 </template>
+
+<script setup>
+import { onMounted } from "vue";
+import { useRoute } from "vue-router";
+import RegisterForm from "../components/auth/RegisterForm.vue";
+
+const route = useRoute();
+
+onMounted(() => {
+  const returnTo = typeof route.query.returnTo === "string" ? route.query.returnTo.trim() : "";
+  if (returnTo) {
+    sessionStorage.setItem("auth_return_to", returnTo);
+  }
+});
+</script>
