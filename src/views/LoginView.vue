@@ -1,10 +1,8 @@
 <template>
-  <div v-if="open" class="modal-backdrop" @click.self="closeModal">
-    <div class="modal-card" role="dialog" aria-modal="true" aria-label="Login">
-      <div class="modal-head">
-        <h2>Iniciar sesion</h2>
-        <button class="icon-btn" @click="closeModal" aria-label="Cerrar">x</button>
-      </div>
+  <section class="form-page">
+    <div class="form-card">
+      <h1>Iniciar sesion</h1>
+      <p>Accede con tu cuenta de ApiLoging.</p>
 
       <form class="clean-form" @submit.prevent="submitLogin">
         <label>
@@ -37,25 +35,18 @@
 
       <p class="register-text">
         No tienes cuenta?
-        <RouterLink to="/registro" @click="closeModal">Registrate</RouterLink>
+        <RouterLink :to="registerUrl">Registrate</RouterLink>
       </p>
     </div>
-  </div>
+  </section>
 </template>
 
 <script setup>
-import { ref } from "vue";
-import { RouterLink } from "vue-router";
+import { computed, onMounted, ref } from "vue";
+import { RouterLink, useRoute } from "vue-router";
 import { auth } from "../services/auth";
 
-const props = defineProps({
-  open: {
-    type: Boolean,
-    default: false,
-  },
-});
-
-const emit = defineEmits(["close", "success"]);
+const route = useRoute();
 
 const email = ref("");
 const password = ref("");
@@ -64,8 +55,26 @@ const success = ref("");
 const canResend = ref(false);
 const loading = ref(false);
 
-function closeModal() {
-  emit("close");
+const returnTo = computed(() => {
+  return typeof route.query.returnTo === "string" ? route.query.returnTo.trim() : "";
+});
+
+const registerUrl = computed(() => {
+  return returnTo.value ? `/registro?returnTo=${encodeURIComponent(returnTo.value)}` : "/registro";
+});
+
+function appendToken(url, token) {
+  const separator = url.includes("?") ? "&" : "?";
+  return `${url}${separator}token=${encodeURIComponent(token)}`;
+}
+
+function redirectIfAlreadyAuthenticated() {
+  if (!returnTo.value || !auth.state.token || !auth.state.user) {
+    return false;
+  }
+
+  window.location.href = appendToken(returnTo.value, auth.state.token);
+  return true;
 }
 
 async function submitLogin() {
@@ -75,9 +84,13 @@ async function submitLogin() {
   loading.value = true;
 
   try {
-    await auth.login(email.value, password.value);
+    const payload = await auth.login(email.value, password.value);
     success.value = "Sesion iniciada";
-    emit("success");
+
+    if (returnTo.value && payload?.token) {
+      window.location.href = appendToken(returnTo.value, payload.token);
+      return;
+    }
   } catch (err) {
     const message = err instanceof Error ? err.message : "No fue posible iniciar sesion";
     error.value = message;
@@ -106,4 +119,16 @@ async function resendMail() {
     loading.value = false;
   }
 }
+
+onMounted(async () => {
+  if (!returnTo.value) {
+    return;
+  }
+
+  if (!auth.state.user && auth.state.token) {
+    await auth.initialize();
+  }
+
+  redirectIfAlreadyAuthenticated();
+});
 </script>
