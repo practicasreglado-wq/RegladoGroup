@@ -6,9 +6,10 @@
     </RouterLink>
 
     <nav class="menu">
-      <RouterLink to="/">Portal</RouterLink>
-      <a href="#portales">Portales</a>
-      <a href="#ayuda">Ayuda</a>
+      <a :href="realstateUrl">Realstate</a>
+      <a :href="energyUrl">Energy</a>
+      <a :href="mapasUrl">Mapas</a>
+      <a :href="enProcesoUrl">EnProceso</a>
     </nav>
 
     <div class="session-box">
@@ -19,8 +20,10 @@
             @click="toggleUserMenu"
             aria-haspopup="menu"
             :aria-expanded="userMenuOpen ? 'true' : 'false'"
+            :title="displayUsername"
+            aria-label="Menu de usuario"
           >
-            {{ displayUsername }}
+            <img :src="userIcon" alt="" class="user-icon" />
           </button>
 
           <div v-if="userMenuOpen" class="user-menu" role="menu" aria-label="Menu de usuario">
@@ -42,6 +45,7 @@
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { RouterLink, useRouter } from "vue-router";
 import logoSrc from "../assets/reglado-energy-logo.svg";
+import userIcon from "../assets/user-icon.svg";
 
 const props = defineProps({
   user: {
@@ -52,6 +56,10 @@ const props = defineProps({
 
 const emit = defineEmits(["open-login", "logout"]);
 const router = useRouter();
+const realstateUrl = import.meta.env.VITE_REGLADO_REALSTATE_URL || "#";
+const energyUrl = import.meta.env.VITE_REGLADO_ENERGY_URL || "http://localhost:5174";
+const mapasUrl = import.meta.env.VITE_REGLADO_MAPAS_URL || "#";
+const enProcesoUrl = import.meta.env.VITE_REGLADO_ENPROCESO_URL || "#";
 
 const userMenuOpen = ref(false);
 const headerRef = ref(null);
@@ -151,10 +159,14 @@ onBeforeUnmount(() => {
 .user-pill {
   border: 1px solid var(--line);
   border-radius: 999px;
-  padding: 0.45rem 0.8rem;
-  font-size: 0.9rem;
+  width: 38px;
+  height: 38px;
+  padding: 0;
   background: #fff;
+  display: grid;
+  place-items: center;
 }
+.user-icon { width: 19px; height: 19px; display: block; color: var(--text); }
 
 .user-menu-trigger {
   cursor: pointer;
