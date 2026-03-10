@@ -1,9 +1,9 @@
 import { createRouter, createWebHistory } from "vue-router";
-import PortalView from "../views/PortalView.vue";
-import RegisterView from "../views/RegisterView.vue";
-import EmailVerifiedView from "../views/EmailVerifiedView.vue";
-import LoginView from "../views/LoginView.vue";
-import SettingsView from "../views/SettingsView.vue";
+import PortalView from "../pages/PortalView.vue";
+import RegisterView from "../pages/RegisterView.vue";
+import EmailVerifiedView from "../pages/EmailVerifiedView.vue";
+import LoginView from "../pages/LoginView.vue";
+import SettingsView from "../pages/SettingsView.vue";
 
 const routes = [
   { path: "/", name: "portal", component: PortalView },
