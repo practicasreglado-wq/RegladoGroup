@@ -1,11 +1,11 @@
 <template>
   <section class="form-page">
     <div class="form-card">
-      <h1>Configuracion de cuenta</h1>
+      <h1>Configuración de cuenta</h1>
       <p>Gestiona tus datos de usuario.</p>
 
       <div v-if="!auth.state.user" class="feedback error">
-        Debes iniciar sesion para ver la configuracion de tu cuenta.
+        Debes iniciar sesión para ver la configuración de tu cuenta.
       </div>
 
       <template v-else>
@@ -39,7 +39,7 @@
 
           <div class="setting-row">
             <div>
-              <strong>Telefono</strong>
+              <strong>Teléfono</strong>
               <p>{{ auth.state.user.phone || "-" }}</p>
             </div>
             <button class="btn-outline" type="button" @click="openModal('phone')">Cambiar</button>
@@ -47,7 +47,7 @@
 
           <div class="setting-row">
             <div>
-              <strong>Contrasena</strong>
+              <strong>Contraseña</strong>
               <p>********</p>
             </div>
             <button class="btn-outline" type="button" @click="openModal('password')">Cambiar</button>
@@ -93,34 +93,34 @@
             <input type="email" :value="auth.state.user?.email || ''" disabled />
           </label>
           <label>
-            Nuevo email
+            Nuevo correo
             <input v-model.trim="emailForm.newEmail" type="email" required />
           </label>
-          <p class="small-note">Te enviaremos un correo de confirmacion al nuevo email.</p>
+          <p class="small-note">Te enviaremos un correo de confirmación al nuevo correo.</p>
         </template>
 
         <template v-else-if="activeModal === 'phone'">
           <label>
-            Telefono actual
+            Teléfono actual
             <input type="text" :value="auth.state.user?.phone || ''" disabled />
           </label>
           <label>
-            Nuevo telefono
+            Nuevo teléfono
             <input v-model.trim="phoneForm.phone" type="tel" required />
           </label>
         </template>
 
         <template v-else-if="activeModal === 'password'">
           <label>
-            Contrasena actual
+            Contraseña actual
             <input v-model="passwordForm.currentPassword" type="password" required />
           </label>
           <label>
-            Nueva contrasena
+            Nueva contraseña
             <input v-model="passwordForm.newPassword" type="password" required minlength="6" />
           </label>
           <label>
-            Confirmar nueva contrasena
+            Confirmar nueva contraseña
             <input v-model="passwordForm.newPasswordConfirmation" type="password" required minlength="6" />
           </label>
         </template>
@@ -158,10 +158,10 @@ const passwordForm = reactive({
 const modalTitle = computed(() => {
   if (activeModal.value === "username") return "Cambiar nombre de usuario";
   if (activeModal.value === "name") return "Cambiar nombre y apellido";
-  if (activeModal.value === "email") return "Cambiar email";
-  if (activeModal.value === "phone") return "Cambiar telefono";
-  if (activeModal.value === "password") return "Cambiar contrasena";
-  return "Configuracion";
+  if (activeModal.value === "email") return "Cambiar correo";
+  if (activeModal.value === "phone") return "Cambiar teléfono";
+  if (activeModal.value === "password") return "Cambiar contraseña";
+  return "Configuración";
 });
 
 const fullName = computed(() => {
@@ -221,22 +221,22 @@ async function submitActiveModal() {
   try {
     if (activeModal.value === "username") {
       await auth.updateUsername(usernameForm.username);
-      success.value = "Nombre de usuario actualizado";
+      success.value = "Nombre de usuario actualizado.";
     }
 
     if (activeModal.value === "name") {
       await auth.updateName(nameForm.firstName, nameForm.lastName);
-      success.value = "Nombre y apellido actualizados";
+      success.value = "Nombre y apellidos actualizados.";
     }
 
     if (activeModal.value === "email") {
       await auth.requestEmailChange(emailForm.newEmail);
-      success.value = "Te enviamos un correo para confirmar el cambio de email";
+      success.value = "Te hemos enviado un correo para confirmar el cambio de correo.";
     }
 
     if (activeModal.value === "phone") {
       await auth.updatePhone(phoneForm.phone);
-      success.value = "Telefono actualizado";
+      success.value = "Teléfono actualizado.";
     }
 
     if (activeModal.value === "password") {
@@ -245,12 +245,12 @@ async function submitActiveModal() {
         passwordForm.newPassword,
         passwordForm.newPasswordConfirmation
       );
-      success.value = "Contrasena actualizada";
+      success.value = "Contraseña actualizada.";
     }
 
     closeModal();
   } catch (err) {
-    modalError.value = err instanceof Error ? err.message : "No fue posible actualizar";
+    modalError.value = err instanceof Error ? err.message : "No fue posible actualizar los datos.";
   } finally {
     loading.value = false;
   }

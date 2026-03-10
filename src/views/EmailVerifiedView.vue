@@ -23,6 +23,7 @@
 import { onMounted, onUnmounted, ref } from "vue";
 import { RouterLink, useRoute, useRouter } from "vue-router";
 import { auth } from "../services/auth";
+import { sanitizeExternalReturnTo } from "../utils/redirects";
 
 const route = useRoute();
 const router = useRouter();
@@ -73,8 +74,8 @@ onMounted(async () => {
       throw new Error("No se pudo iniciar la sesion con el token recibido.");
     }
 
-    const queryReturnTo = typeof route.query.returnTo === "string" ? route.query.returnTo.trim() : "";
-    const storedReturnTo = sessionStorage.getItem("auth_return_to") || "";
+    const queryReturnTo = sanitizeExternalReturnTo(typeof route.query.returnTo === "string" ? route.query.returnTo : "");
+    const storedReturnTo = sanitizeExternalReturnTo(sessionStorage.getItem("auth_return_to") || "");
     destination.value = queryReturnTo || storedReturnTo || "/";
     if (storedReturnTo) {
       sessionStorage.removeItem("auth_return_to");
