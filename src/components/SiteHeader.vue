@@ -9,7 +9,7 @@
       <a :href="realstateUrl">Realstate</a>
       <a :href="energyUrl">Energy</a>
       <a :href="mapasUrl">Mapas</a>
-      <a :href="enProcesoUrl">EnProceso</a>
+      <a :href="enProcesoUrl">En proceso</a>
     </nav>
 
     <div class="session-box">
@@ -21,22 +21,22 @@
             aria-haspopup="menu"
             :aria-expanded="userMenuOpen ? 'true' : 'false'"
             :title="displayUsername"
-            aria-label="Menu de usuario"
+            aria-label="Menú de usuario"
           >
             <img :src="userIcon" alt="" class="user-icon" />
           </button>
 
-          <div v-if="userMenuOpen" class="user-menu" role="menu" aria-label="Menu de usuario">
+          <div v-if="userMenuOpen" class="user-menu" role="menu" aria-label="Menú de usuario">
             <button class="user-menu-item" type="button" role="menuitem" @click="goToSettings">
-              Configuracion
+              Configuración
             </button>
             <button class="user-menu-item danger" type="button" role="menuitem" @click="logout">
-              Cerrar sesion
+              Cerrar sesión
             </button>
           </div>
         </div>
       </template>
-      <button v-else class="btn-primary" @click="$emit('open-login')">Login</button>
+      <button v-else class="btn-primary" @click="$emit('open-login')">Iniciar sesión</button>
     </div>
   </header>
 </template>

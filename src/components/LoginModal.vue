@@ -1,8 +1,8 @@
 <template>
   <div v-if="open" class="modal-backdrop" @click.self="closeModal">
-    <div class="modal-card" role="dialog" aria-modal="true" aria-label="Login">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-label="Inicio de sesión">
       <div class="modal-head">
-        <h2>Iniciar sesion</h2>
+        <h2>Iniciar sesión</h2>
         <button class="icon-btn" @click="closeModal" aria-label="Cerrar">x</button>
       </div>
 
@@ -13,7 +13,7 @@
         </label>
 
         <label>
-          Contrasena
+          Contraseña
           <input v-model="password" type="password" placeholder="********" required />
         </label>
 
@@ -32,12 +32,18 @@
         :disabled="loading"
         @click="resendMail"
       >
-        Reenviar correo de verificacion
+        Reenviar correo de verificación
       </button>
 
+      <p class="helper-text">
+        <RouterLink to="/recuperar-contrasena" @click="closeModal">
+          ¿Has olvidado tu contraseña?
+        </RouterLink>
+      </p>
+
       <p class="register-text">
-        No tienes cuenta?
-        <RouterLink to="/registro" @click="closeModal">Registrate</RouterLink>
+        ¿No tienes cuenta?
+        <RouterLink to="/registro" @click="closeModal">Regístrate</RouterLink>
       </p>
     </div>
   </div>
@@ -76,12 +82,12 @@ async function submitLogin() {
 
   try {
     await auth.login(email.value, password.value);
-    success.value = "Sesion iniciada";
+    success.value = "Sesión iniciada.";
     emit("success");
   } catch (err) {
-    const message = err instanceof Error ? err.message : "No fue posible iniciar sesion";
+    const message = err instanceof Error ? err.message : "No fue posible iniciar sesión.";
     error.value = message;
-    canResend.value = message === "email not verified";
+    canResend.value = message === "Debes confirmar tu correo antes de iniciar sesión.";
   } finally {
     loading.value = false;
   }
@@ -89,7 +95,7 @@ async function submitLogin() {
 
 async function resendMail() {
   if (!email.value) {
-    error.value = "Indica un email para reenviar la verificacion";
+    error.value = "Indica un correo para reenviar la verificación.";
     return;
   }
 
@@ -99,9 +105,9 @@ async function resendMail() {
 
   try {
     const response = await auth.resendVerification(email.value);
-    success.value = response.message || "Correo de verificacion reenviado";
+    success.value = response.message || "Correo de verificación reenviado.";
   } catch (err) {
-    error.value = err instanceof Error ? err.message : "No fue posible reenviar el correo";
+    error.value = err instanceof Error ? err.message : "No fue posible reenviar el correo.";
   } finally {
     loading.value = false;
   }

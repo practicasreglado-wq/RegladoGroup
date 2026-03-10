@@ -11,6 +11,34 @@ const state = reactive({
   loading: false,
 });
 
+const AUTH_MESSAGE_MAP = {
+  "request failed": "La solicitud no se pudo completar.",
+  "invalid credentials": "Credenciales incorrectas.",
+  "email not verified": "Debes confirmar tu correo antes de iniciar sesión.",
+  unauthorized: "Debes iniciar sesión para continuar.",
+  "token revoked": "Tu sesión ya no es válida. Vuelve a iniciar sesión.",
+  "invalid token": "Tu sesión no es válida. Vuelve a iniciar sesión.",
+  "too many requests, try again later": "Has realizado demasiados intentos. Inténtalo más tarde.",
+  "valid email is required": "Debes indicar un correo válido.",
+  "invalid email": "El correo no es válido.",
+  "invalid phone": "El teléfono no es válido.",
+  "passwords do not match": "Las contraseñas no coinciden.",
+  "new passwords do not match": "Las contraseñas nuevas no coinciden.",
+  "password must be at least 6 characters": "La contraseña debe tener al menos 6 caracteres.",
+  "new password must be at least 6 characters": "La nueva contraseña debe tener al menos 6 caracteres.",
+  "current password is incorrect": "La contraseña actual no es correcta.",
+  "new password must be different from current password": "La nueva contraseña debe ser distinta de la actual.",
+  "if the account exists, a recovery email was sent": "Si la cuenta existe, te hemos enviado un correo de recuperación.",
+  "verification email sent": "Correo de verificación reenviado.",
+  "email is already verified": "El correo ya está verificado.",
+  "email change confirmation sent": "Te hemos enviado un correo para confirmar el cambio de correo.",
+  "password updated": "Contraseña actualizada.",
+  "email updated": "Correo actualizado.",
+  "logged out": "Sesión cerrada.",
+  "email or username already exists": "El correo o el nombre de usuario ya están en uso.",
+  "username already exists": "El nombre de usuario ya está en uso.",
+};
+
 function authHeaders() {
   return state.token ? { Authorization: `Bearer ${state.token}` } : {};
 }
@@ -32,7 +60,7 @@ async function request(path, options = {}) {
   }
 
   if (!response.ok) {
-    const message = payload.error || payload.message || "request failed";
+    const message = translateAuthMessage(payload.error || payload.message || "request failed");
     throw new Error(message);
   }
 
@@ -168,6 +196,24 @@ async function resendVerification(email) {
   });
 }
 
+async function requestPasswordReset(email) {
+  return request("/auth/request-password-reset", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+}
+
+async function resetPassword(token, newPassword, newPasswordConfirmation) {
+  return request("/auth/reset-password", {
+    method: "POST",
+    body: JSON.stringify({
+      token,
+      new_password: newPassword,
+      new_password_confirmation: newPasswordConfirmation,
+    }),
+  });
+}
+
 async function logout() {
   try {
     if (state.token) {
@@ -194,6 +240,8 @@ export const auth = {
   requestEmailChange,
   changePassword,
   resendVerification,
+  requestPasswordReset,
+  resetPassword,
   logout,
 };
 
@@ -214,4 +262,8 @@ function getCookie(name) {
     }
   }
   return "";
+}
+
+function translateAuthMessage(message) {
+  return AUTH_MESSAGE_MAP[message] || message;
 }

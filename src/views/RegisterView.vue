@@ -10,11 +10,12 @@
 import { onMounted } from "vue";
 import { useRoute } from "vue-router";
 import RegisterForm from "../components/auth/RegisterForm.vue";
+import { sanitizeExternalReturnTo } from "../utils/redirects";
 
 const route = useRoute();
 
 onMounted(() => {
-  const returnTo = typeof route.query.returnTo === "string" ? route.query.returnTo.trim() : "";
+  const returnTo = sanitizeExternalReturnTo(typeof route.query.returnTo === "string" ? route.query.returnTo : "");
   if (returnTo) {
     sessionStorage.setItem("auth_return_to", returnTo);
   }

@@ -1,8 +1,8 @@
 <template>
   <section class="form-page">
     <div class="form-card">
-      <h1>Iniciar sesion</h1>
-      <p>Accede con tu cuenta de ApiLoging.</p>
+      <h1>Iniciar sesión</h1>
+      <p>Accede con tu cuenta.</p>
 
       <form class="clean-form" @submit.prevent="submitLogin">
         <label>
@@ -11,7 +11,7 @@
         </label>
 
         <label>
-          Contrasena
+          Contraseña
           <input v-model="password" type="password" placeholder="********" required />
         </label>
 
@@ -30,12 +30,16 @@
         :disabled="loading"
         @click="resendMail"
       >
-        Reenviar correo de verificacion
+        Reenviar correo de verificación
       </button>
 
+      <p class="helper-text">
+        <RouterLink to="/recuperar-contrasena">¿Has olvidado tu contraseña?</RouterLink>
+      </p>
+
       <p class="register-text">
-        No tienes cuenta?
-        <RouterLink :to="registerUrl">Registrate</RouterLink>
+        ¿No tienes cuenta?
+        <RouterLink :to="registerUrl">Regístrate</RouterLink>
       </p>
     </div>
   </section>
@@ -45,6 +49,7 @@
 import { computed, onMounted, ref } from "vue";
 import { RouterLink, useRoute } from "vue-router";
 import { auth } from "../services/auth";
+import { sanitizeExternalReturnTo } from "../utils/redirects";
 
 const route = useRoute();
 
@@ -56,7 +61,7 @@ const canResend = ref(false);
 const loading = ref(false);
 
 const returnTo = computed(() => {
-  return typeof route.query.returnTo === "string" ? route.query.returnTo.trim() : "";
+  return sanitizeExternalReturnTo(typeof route.query.returnTo === "string" ? route.query.returnTo : "");
 });
 
 const registerUrl = computed(() => {
@@ -85,16 +90,16 @@ async function submitLogin() {
 
   try {
     const payload = await auth.login(email.value, password.value);
-    success.value = "Sesion iniciada";
+    success.value = "Sesión iniciada.";
 
     if (returnTo.value && payload?.token) {
       window.location.href = appendToken(returnTo.value, payload.token);
       return;
     }
   } catch (err) {
-    const message = err instanceof Error ? err.message : "No fue posible iniciar sesion";
+    const message = err instanceof Error ? err.message : "No fue posible iniciar sesión.";
     error.value = message;
-    canResend.value = message === "email not verified";
+    canResend.value = message === "Debes confirmar tu correo antes de iniciar sesión.";
   } finally {
     loading.value = false;
   }
@@ -102,7 +107,7 @@ async function submitLogin() {
 
 async function resendMail() {
   if (!email.value) {
-    error.value = "Indica un email para reenviar la verificacion";
+    error.value = "Indica un correo para reenviar la verificación.";
     return;
   }
 
@@ -112,9 +117,9 @@ async function resendMail() {
 
   try {
     const response = await auth.resendVerification(email.value);
-    success.value = response.message || "Correo de verificacion reenviado";
+    success.value = response.message || "Correo de verificación reenviado.";
   } catch (err) {
-    error.value = err instanceof Error ? err.message : "No fue posible reenviar el correo";
+    error.value = err instanceof Error ? err.message : "No fue posible reenviar el correo.";
   } finally {
     loading.value = false;
   }
